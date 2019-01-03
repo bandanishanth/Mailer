@@ -1,9 +1,9 @@
 # Mailer
 A Simple Mailer Program that can send multiple emails using Python.
 
-Description:
+# Description:
 
-This Project came about when i saw my AMC (Academic Monitoring Chairperson ) manually typing out Emails to parents (62 of them!).
+This Project came about when i noticed my AMC (Academic Monitoring Chairperson ) manually typing out Emails to parents (62 of them!).
 
 This problem screamed for the need to automate it.
 

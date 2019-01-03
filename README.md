@@ -7,5 +7,5 @@ This Project came about when i noticed my AMC (Academic Monitoring Chairperson )
 
 This problem screamed for the need to automate it.
 
-This project began ever since i was a beginner to Python and you get to see the various iterations of the Quality of the code :).
+This script began taking shape ever since i was a beginner in Python and you get to see the various iterations of the Quality of the code :).
 

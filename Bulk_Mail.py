@@ -1,75 +1,91 @@
-import smtplib #Simple mail transfer protocol.......
-import getpass #Password hiding module..............
-def get_userid():
-	sender = input("Please enter your email:\n")
-	return sender
-def get_userpassword():
-	sender_password = getpass.getpass("Please enter your password:\n")
-	return sender_password
-def take_id(teacher_message,subject,sender,sender_password):
-    d={}#Declare a dictionary to map Student Name and Parent Email
-    n=int(input("Please enter the number of recepients:\n"))#Integer taking number of recepients as input..
-    for i in range(n):
-        print("Enter the name of student " +str(i+1)+":")
-        student_name=input()
-        print("Enter the valid email id of parent: ")
-        parent_id=input()
-        d[student_name]=parent_id
-        #Dictionary has name as key and parent's email id as value..
-        #message_with_name=teacher_message.replace("$SNAME$",i)#RETURNS THE ENTERED MESSAGE WITH STUDENT NAME..
-        #parent_id=d[i]#Parent ID is the value stored in the dictionary with name as key...
-    send_mail(teacher_message,subject,sender,sender_password,d)
+#Importing the SMTP library API that will be sending the mail....
+import smtplib
+#A Password input module that does not display console...........
+import getpass
 
-def input_message():#TAKE MESSAGE FROM TEACHER ONLY ONE TIME..
-	msg=""
-	temp=""
-	print("Please Enter the Message to be sent,Enter the string $SNAME$ where ever you want the student name to be displayed,Enter the word END on a newline to stop your Message:")
-	while temp!="END\n":
-		temp=input()
-		temp+='\n'
-		msg+=temp
-	return(msg[:len(msg)-4])#Returns Message from the Teacher as a string, after removing END
-def input_subject():
-    subject=input("Enter the Subject of the Message:")
-    return subject
-
-def send_mail(message,subject,sender,sender_password,d):
-    k=1 #Count
-    try:
-        smtpObj = smtplib.SMTP_SSL('smtp.gmail.com','465')
-        print("Connecting to Mail Server")
-        smtpObj.ehlo()#hello. ..
-        print("Sending Hello Packets")
-        #smtpObj.starttls()# securing using tls
-        #print("Starting TLS...")
-        smtpObj.login(sender,sender_password)#Login using the sender's Id and Password..
-        print("Logged in")
-        for receiver in d:
-        	message_with_name=message.replace("$SNAME$",receiver)
-        	smtpObj.sendmail(sender,d[receiver],'Subject:'+subject+'\n'+message_with_name+'\n')
-        	print("Email " +str(k)+ " sent.")
-        	k+=1 #Increment count..
-        smtpObj.quit()
-        print("Done.")
-    except smtplib.SMTPHeloError:
-    	print("Server did not reply to 'HELO' greeting.")
-    except smtplib.SMTPServerDisconnected:
-    	print("Server Disconnected.")
-    except smtplib.SMTPSenderRefused:
-    	print("Sender Refused")
-    except smtplib.SMTPAuthenticationError as e:
-    	print("Authentication Error Occured:\n"+str(e))
-    except e:
-    	print("Sorry something went wrong, check your internet connection.")
-    	print("Message:"+str(e))
-
-#GET THE TEACHER's MESSAGE....
+#Mailer class.
+class Mailer:
+	#A class constructor that takes the arguments as apparent below.
+	def __init__(self):
+		pass
+	def set(self,sender_id,sender_password,subject,message,recepients):
+		self.__sender_id=sender_id
+		self.__sender_password=sender_password
+		self.__message=message
+		self.subject=subject
+		self.recepients=recepients
+		#Initially Null that will later become a smtplib object.
+		self.mobj=None
+		#__call__=self
+		return self
+	def __call__(self):
+		return self
+	def display_data(self):
+		return(self.__sender_id,self.__message,self.recepients)
+	#We pass the host (Eg:smtp.gmail.com) and the port number as strings.
+	def login(self,host,port):
+		try:
+			print("Attempting to connect!!!")
+			self.mobj=smtplib.SMTP_SSL(host,port)
+			print("Sending Helllo Packets!!")
+			self.mobj.ehlo()
+			print("Attempting Login!")
+			self.mobj.login(self.__sender_id,self.__sender_password)
+			print("Logged in successfully.")
+		except smtplib.SMTPHeloError as e:
+			print("Server did not respond to helo packets!!")
+			print("Mesage:"+str(e))
+		except smtplib.SMTPServerDisconnected as e:
+			print("Server Disconnected")
+			print("Message:"+str(e))
+		except smtplib.SMTPAuthenticationError as e:
+			print("Authentication error occured with message:"+str(e))
+		except smtplib.SMTPConnectError as e:
+			print("Error occoured while connecting to server with message:"+str(e))	
+			print("Error occured.")
+	def logout(self):
+		try:
+			self.mobj.quit()
+		except smtplib.SMTPException as e:
+			print("Something went wrong!!")
+			print("Message:"+str(e))
+		return(True)
+	def send(self,recepient):
+		print("Attempting to send.")
+		try:
+			self.mobj.sendmail(self.__sender_id,recepient,'Subject:'+self.subject+'\n'+self.__message+'\n')
+			print("Sent")
+		except smtplib.SMTPException as e:
+			print("Something went wrong!!")
+			print("Message:"+str(e))
+		except smtplib.SMTPResponseException as e:
+			print("A Response exception was raised")
+			print("Message:"+str(e))
+			print("Error Code:"+str(e.smtp_error))
+		except smtplib.SMTPSenderRefused as e:
+			print("Sender refused to send.")
+			print("Message:"+str(e))
+		except:
+			print("Something went wrong in sending mail to "+recepient)
+	def send_mails(self,host,port):
+		#Login first with desired host and port.
+		self.login(host,port)
+		#For each recipient send a mail..
+		for recepient in self.recepients:
+			self.send(recepient)
+		#Logout
+		self.logout()
+#If this module itself is being run....testing occours with the following static arguments.
+#Modify the main part for testing as needed....for now the 
 if __name__=="__main__":
-	id=get_userid()
-	password=get_userpassword()
-	subject=input_subject()#Holds the Subject..
-	teacher_message=input_message()#Takes Teacher's Message..
-	take_id(teacher_message,subject,id,password)
-	#input()
-
+	sender_id=input("Enter sender ID:")
+	sender_password=getpass.getpass("Enter sender password:")
+	subject=input("Enter the subject:")
+	message=input("Enter the message in a single line:")
+	recepients=[x for x in input("Enter recepients seperated with commas:").split(',')]
+	m=Mailer()
+	m.set(sender_id,sender_password,subject,message,recepients)
+	#print(callable(Mailer(sender_id,sender_password,subject,message,recepients)))
+	m.send_mails("smtp.gmail.com","465")
+	input("Press any key to exit.")
 

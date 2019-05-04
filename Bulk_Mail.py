@@ -95,6 +95,5 @@ if __name__ == "__main__":
     recepients = [x for x in input("Enter recepients seperated with commas:").split(',')]
     m = Mailer()
     m.set(sender_id, sender_password, subject, message, recepients)
-    # print(callable(Mailer(sender_id,sender_password,subject,message,recepients)))
     m.send_mails("smtp.gmail.com", "465")
     input("Press any key to exit.")

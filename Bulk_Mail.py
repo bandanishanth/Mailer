@@ -92,17 +92,6 @@ class Mailer:
 
         # Logout
         self.logout()
-        
-    def send_mails(self,host,port):
-
-        # Login first with desired host and port.
-        self.login(host,port)
-
-        # For each recipient send a mail..
-        for recepient in self.recepients:
-            self.send(recepient)
-        
-        self.logout()
 
     def set_message(message):
         self.__message = message

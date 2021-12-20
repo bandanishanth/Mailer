@@ -10,7 +10,7 @@ This project came about when I noticed my AMC (Academic Monitoring Chairperson) 
 
 This script began taking shape ever since I was a beginner in Python, so you get to see various iterations of the quality of the code :sweat_smile:
 
-> This project is NOT meant for production and hasn't been tested thoroughly.
+> This is just a hobby project.
 
 ## Requirements
 - `smtplib`: The in-built SMTP package for sending the emails.
